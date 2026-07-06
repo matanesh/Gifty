@@ -1,0 +1,24 @@
+{
+  "login": {
+    "title": "התחברות",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "submit": "היכנס",
+    "noAccount": "אין לך חשבון? הירשם"
+  },
+  "dashboard": {
+    "title": "הכרטיסים שלי",
+    "totalBalance": "יתרה כוללת",
+    "expiringSoon": "פג תוקף בקרוב",
+    "addCard": "הוסף כרטיס",
+    "activeCards": "כרטיסים פעילים"
+  },
+  "addCard": {
+    "title": "הוסף כרטיס חדש",
+    "brandName": "שם הרשת",
+    "cardCode": "מספר כרטיס",
+    "balance": "יתרה",
+    "expiryDate": "תוקף",
+    "save": "שמור כרטיס"
+  }
+}

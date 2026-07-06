@@ -1,0 +1,24 @@
+{
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign In",
+    "noAccount": "Don't have an account? Sign up"
+  },
+  "dashboard": {
+    "title": "My Cards",
+    "totalBalance": "Total Balance",
+    "expiringSoon": "Expiring Soon",
+    "addCard": "Add Card",
+    "activeCards": "Active Cards"
+  },
+  "addCard": {
+    "title": "Add New Card",
+    "brandName": "Brand Name",
+    "cardCode": "Card Number",
+    "balance": "Balance",
+    "expiryDate": "Expiry Date",
+    "save": "Save Card"
+  }
+}
