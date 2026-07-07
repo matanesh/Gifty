@@ -77,7 +77,7 @@ async function getMasterKey(): Promise<CryptoKey> {
     const keyBytes = base64ToBytes(storedKey);
     cachedKey = await crypto.subtle.importKey(
       'raw',
-      keyBytes,
+      toArrayBuffer(keyBytes),
       { name: 'AES-GCM', length: 256 },
       false, // not extractable after import (defence in depth)
       ['encrypt', 'decrypt'],
@@ -102,7 +102,7 @@ async function getMasterKey(): Promise<CryptoKey> {
     const keyBytes = new Uint8Array(exported);
     cachedKey = await crypto.subtle.importKey(
       'raw',
-      keyBytes,
+      toArrayBuffer(keyBytes),
       { name: 'AES-GCM', length: 256 },
       false,
       ['encrypt', 'decrypt'],
@@ -290,7 +290,7 @@ function bytesToBase64(bytes: Uint8Array): string {
   let binary = '';
   const len = bytes.byteLength;
   for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
+    binary += String.fromCharCode(bytes[i] ?? 0);
   }
   return btoa(binary);
 }
@@ -305,4 +305,13 @@ function base64ToBytes(base64: string): Uint8Array {
     bytes[i] = binary.charCodeAt(i);
   }
   return bytes;
+}
+
+/**
+ * Converts a Uint8Array view to a standalone ArrayBuffer for Web Crypto APIs.
+ * TypeScript 5.9 models Uint8Array buffers as ArrayBufferLike, but Web Crypto
+ * expects a concrete ArrayBuffer in this project configuration.
+ */
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }

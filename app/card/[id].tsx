@@ -69,7 +69,7 @@ export default function CardDetailScreen() {
           style: 'destructive',
           onPress: () => {
             deleteCard(card!.id, {
-              onSuccess: () => router.replace('/(tabs)/'),
+              onSuccess: () => router.replace('/(tabs)'),
             });
           },
         },
@@ -91,7 +91,7 @@ export default function CardDetailScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView contentContainerClassName="pb-10" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
 
         {/* ── Hero Card ───────────────────────────────────────────────── */}
         <View className={`${COLOR_MAP[card.color] ?? 'bg-blue-600'} px-6 pt-12 pb-8`}>

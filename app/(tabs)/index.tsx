@@ -109,7 +109,11 @@ export default function DashboardScreen() {
           <Text className="text-sm font-semibold text-red-600 px-4 mb-2">
             {i18n.t('dashboard.expiringSoon')}
           </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="px-4 gap-3">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}
+          >
             {expiringCards.map((card) => {
               const days = Math.ceil((new Date(card.valid_until!).getTime() - Date.now()) / 86400000);
               return (
@@ -145,7 +149,7 @@ export default function DashboardScreen() {
           data={cards}
           keyExtractor={(item) => item.id}
           numColumns={2}
-          contentContainerClassName="px-3 pb-24"
+          contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 96 }}
           renderItem={({ item }) => (
             <CardGridItem card={item} onPress={() => router.push(`/card/${item.id}`)} />
           )}

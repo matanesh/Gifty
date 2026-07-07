@@ -91,13 +91,13 @@ export const CARD_COLORS = [
 export const cardFormSchema = z
   .object({
     brand_name: z
-      .string({ required_error: 'Brand name is required' })
+      .string({ error: 'Brand name is required' })
       .min(1, 'Brand name is required')
       .max(100, 'Brand name must be 100 characters or fewer')
       .trim(),
 
-    card_type: z.enum(['gift_card', 'loyalty', 'voucher', 'prepaid'], {
-      required_error: 'Card type is required',
+    card_type: z.enum(['gift_card', 'loyalty', 'voucher', 'prepaid'] as const, {
+      error: 'Card type is required',
     }),
 
     code: z
@@ -206,8 +206,11 @@ export const cardFormSchema = z
     }
   });
 
-/** Inferred TypeScript type from the Zod schema. */
-export type GiftCardFormValues = z.infer<typeof cardFormSchema>;
+/** Parsed form values after Zod defaults/transforms have been applied. */
+export type GiftCardFormValues = z.output<typeof cardFormSchema>;
+
+/** Raw values managed by React Hook Form before Zod applies defaults. */
+type GiftCardFormInputValues = z.input<typeof cardFormSchema>;
 
 // ---------------------------------------------------------------------------
 // Brand autocomplete types
@@ -266,6 +269,7 @@ export function CardForm({
 
   // ---- Pin visibility -----------------------------------------------------
   const [pinVisible, setPinVisible] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // ---- React Hook Form --------------------------------------------------------
   const {
@@ -274,7 +278,7 @@ export function CardForm({
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<GiftCardFormValues>({
+  } = useForm<GiftCardFormInputValues, undefined, GiftCardFormValues>({
     resolver: zodResolver(cardFormSchema),
     defaultValues: {
       brand_name: '',
@@ -376,6 +380,7 @@ export function CardForm({
   const onSubmit = useCallback(
     async (values: GiftCardFormValues) => {
       try {
+        setSubmitError(null);
         // Encrypt sensitive fields before persisting
         const { code, pin, card_number } = await encryptCardFields({
           code: values.code || null,
@@ -429,11 +434,17 @@ export function CardForm({
       } catch (err) {
         const message =
           err instanceof Error ? err.message : 'An unexpected error occurred.';
+        console.error('[Gifty/CardForm] Failed to save card:', err);
+        setSubmitError(message);
         Alert.alert('Failed to save card', message);
       }
     },
     [mode, cardId, addCard, updateCard, onSuccess],
   );
+
+  const onInvalid = useCallback(() => {
+    setSubmitError('Please fix the highlighted fields before saving.');
+  }, []);
 
   // ---------------------------------------------------------------------------
   // Render helpers
@@ -553,7 +564,7 @@ export function CardForm({
     >
       <ScrollView
         className="flex-1"
-        contentContainerClassName="p-4 pb-10"
+        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
         keyboardShouldPersistTaps="handled"
       >
 
@@ -833,6 +844,12 @@ export function CardForm({
         )}
 
         {/* ── Actions ─────────────────────────────────────────────────────── */}
+        {submitError && (
+          <Text className="text-red-600 text-sm mb-3" accessibilityRole="alert">
+            {submitError}
+          </Text>
+        )}
+
         <View className="flex-row gap-3 mt-4">
           {onCancel && (
             <Button
@@ -848,7 +865,7 @@ export function CardForm({
               ? 'Saving…'
               : mode === 'edit' ? 'Save Changes' : 'Add Card'}
             variant="primary"
-            onPress={handleSubmit(onSubmit)}
+            onPress={handleSubmit(onSubmit, onInvalid)}
             isLoading={isSubmitting}
             className={onCancel ? 'flex-1' : 'w-full'}
             accessibilityLabel={mode === 'edit' ? 'Save changes' : 'Add card'}

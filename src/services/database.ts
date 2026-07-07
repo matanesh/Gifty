@@ -207,6 +207,23 @@ export async function initDatabase(): Promise<SQLite.SQLiteDatabase> {
 }
 
 /**
+ * Ensures the Phase 1 local-only MVP has a usable profile row.
+ * Supabase auth/sync is intentionally deferred, but the local schema and hooks
+ * still scope all card data by user_id.
+ */
+export async function ensureLocalMvpUser(): Promise<void> {
+  const database = getDatabase();
+  const now = new Date().toISOString();
+
+  await database.runAsync(
+    `INSERT OR IGNORE INTO users (
+       id, email, display_name, preferred_currency, language, created_at, updated_at
+     ) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+    ['local-user', 'local@gifty.app', 'Local User', 'ILS', 'he', now, now],
+  );
+}
+
+/**
  * Executes all DDL statements required to bring the schema to the current version.
  *
  * @param database - Open SQLiteDatabase instance.
